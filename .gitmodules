@@ -1,0 +1,3 @@
+[submodule "onearth"]
+	path = onearth
+	url = https://github.com/nasa-gibs/onearth.git

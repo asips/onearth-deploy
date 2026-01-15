@@ -1,0 +1,31 @@
+stages:
+  - deploy
+
+variables:
+  DOCKER_DRIVER: overlay2
+
+.deploy_template: &deploy_template
+  stage: deploy
+  script:
+    - cd "${CI_PROJECT_DIR}"
+    - source env.sh
+    - bash patches/apply-patches.sh
+    - cd onearth/docker/local-deployment
+    - bash ./generate-configs.sh
+    - bash ./setup-onearth-local.sh
+  tags:
+    - shell
+
+deploy_production:
+  <<: *deploy_template
+  only:
+    - main
+  variables:
+    ONEARTH_PORT: 80
+
+deploy_test:
+  <<: *deploy_template
+  only:
+    - dev
+  variables:
+    ONEARTH_PORT: 8080
