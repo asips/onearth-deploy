@@ -1,0 +1,13 @@
+--- a/docker/local-deployment/setup-onearth-local.sh
++++ b/docker/local-deployment/setup-onearth-local.sh
+@@ -330,8 +330,8 @@ discover_layers() {
+             if [ -d "$layer_dir" ]; then
+                 layer_name=$(basename "$layer_dir")
+                 echo "      • $layer_name"
+-                ((layer_count++))
+-                ((TOTAL_LAYERS++))
++                ((layer_count++)) || true
++                ((TOTAL_LAYERS++)) || true
+             fi
+         done
+         if [ $layer_count -eq 0 ]; then
