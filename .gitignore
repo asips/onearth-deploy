@@ -1,12 +1,2 @@
-# Generated configurations (created by scripts)
-onearth/docker/local-deployment/onearth-configs/
-onearth/docker/local-deployment/output/
-
-# Local testing artifacts
-*.swp
-*.swo
-*~
-.DS_Store
-
-# Local environment overrides (keep env.sh in git as template)
-# Users should edit env.sh directly if needed for their environment
+local/data/*/epsg????
+local/deployment
