@@ -1,7 +1,9 @@
 #!/bin/bash
 # deploy.sh - Prepare and initialize a fresh OnEarth deployment directory
-# Copies the onearth submodule into DEST/onearth-repo, applies patches,
-# then runs generate-configs and setup-onearth-local in the copied repo.
+# Requires environment variables:
+#   ONEARTH_DEPLOY_DIR - destination directory for deployment (must not exist)
+#   MRF_ARCHIVE_DIR - path to MRF archive data directory
+#   SHP_ARCHIVE_DIR - path to shapefile archive data directory
 
 set -euo pipefail
 
@@ -12,20 +14,37 @@ ONEARTH_SRC="${PROJECT_ROOT}/onearth/repo"
 PATCH_DIR="${PROJECT_ROOT}/onearth/patches"
 
 usage() {
-  echo "Usage: ${SCRIPT_NAME} <destination-dir>"
-  echo "  destination-dir: path to create (must not already exist); onearth will be placed directly in destination-dir"
+  echo "Usage: ONEARTH_DEPLOY_DIR=/path/to/deploy MRF_ARCHIVE_DIR=/path/to/mrf SHP_ARCHIVE_DIR=/path/to/shp ${SCRIPT_NAME}"
+  echo ""
+  echo "Required environment variables:"
+  echo "  ONEARTH_DEPLOY_DIR - destination directory (must not exist)"
+  echo "  MRF_ARCHIVE_DIR    - path to MRF archive directory"
+  echo "  SHP_ARCHIVE_DIR    - path to shapefile archive directory"
 }
 
-if [ "$#" -ne 1 ]; then
+# Check required environment variables
+if [ -z "${ONEARTH_DEPLOY_DIR:-}" ] || [ -z "${MRF_ARCHIVE_DIR:-}" ] || [ -z "${SHP_ARCHIVE_DIR:-}" ]; then
+  echo "ERROR: Missing required environment variables"
   usage
   exit 2
 fi
 
-DEST_DIR="$1"
+DEST_DIR="${ONEARTH_DEPLOY_DIR}"
 
 # Validate source
 if [ ! -d "${ONEARTH_SRC}" ]; then
   echo "ERROR: OnEarth source not found at ${ONEARTH_SRC}. Initialize submodule first."
+  exit 1
+fi
+
+# Validate archive directories exist
+if [ ! -d "${MRF_ARCHIVE_DIR}" ]; then
+  echo "ERROR: MRF archive directory not found at ${MRF_ARCHIVE_DIR}"
+  exit 1
+fi
+
+if [ ! -d "${SHP_ARCHIVE_DIR}" ]; then
+  echo "ERROR: Shapefile archive directory not found at ${SHP_ARCHIVE_DIR}"
   exit 1
 fi
 
@@ -40,7 +59,21 @@ mkdir -p "${DEST_DIR}"
 
 # Resolve absolute paths for predictable execution
 DEST_DIR_ABS="$(cd "${DEST_DIR}" && pwd)"
+MRF_ARCHIVE_ABS="$(cd "${MRF_ARCHIVE_DIR}" && pwd)"
+SHP_ARCHIVE_ABS="$(cd "${SHP_ARCHIVE_DIR}" && pwd)"
 LOCAL_DEPLOY_DIR="${DEST_DIR_ABS}/docker/local-deployment"
+
+echo "========================================="
+echo "Setup Deployment Directory"
+echo "========================================="
+echo "Project Root:        ${PROJECT_ROOT}"
+echo "Source OnEarth:      ${ONEARTH_SRC}"
+echo "Destination:         ${DEST_DIR_ABS}"
+echo "MRF Archive:         ${MRF_ARCHIVE_ABS}"
+echo "Shapefile Archive:   ${SHP_ARCHIVE_ABS}"
+echo "Local Deploy:        ${LOCAL_DEPLOY_DIR}"
+echo "========================================="
+echo ""
 
 # Copy onearth repo
 echo "Copying onearth to ${DEST_DIR_ABS}..."
@@ -87,24 +120,28 @@ echo "Running setup-onearth-local (opinionated defaults)..."
 echo ""
 echo "Creating docker compose wrapper script..."
 RUN_SCRIPT="${LOCAL_DEPLOY_DIR}/run-docker-compose.sh"
-cat > "${RUN_SCRIPT}" <<'EOF'
+cat > "${RUN_SCRIPT}" <<EOF
 #!/usr/bin/env bash
 # run-docker-compose.sh - set env vars (like setup-onearth-local.sh does) then run docker compose
 
 set -euo pipefail
 
 source ../../version.sh
-export DOCKER_PLATFORM_OPTION=$(uname -m | grep -qE 'aarch64|arm64' && echo "linux/amd64" || echo "")
+export DOCKER_PLATFORM_OPTION=\$(uname -m | grep -qE 'aarch64|arm64' && echo "linux/amd64" || echo "")
 export USE_SSL=false  # Disable SSL for local development
 export SERVER_NAME=localhost
 export DEBUG_LOGGING=true  # Enable debug logging for local development
-export ONEARTH_DEPS_TAG=nasagibs/onearth-deps:${ONEARTH_VERSION}
-export ONEARTH_IMAGE_TAG=${ONEARTH_VERSION}
+export ONEARTH_DEPS_TAG=nasagibs/onearth-deps:\${ONEARTH_VERSION}
+export ONEARTH_IMAGE_TAG=\${ONEARTH_VERSION}
 export START_ONEARTH_TOOLS_CONTAINER=0
 export COMPOSE_PROJECT_NAME=onearth
 export COMPOSE_FILE=docker-compose.local.yml
 
-exec docker compose "$@"
+# Archive directories
+export MRF_ARCHIVE_DIR="${MRF_ARCHIVE_ABS}"
+export SHP_ARCHIVE_DIR="${SHP_ARCHIVE_ABS}"
+
+exec docker compose "\$@"
 EOF
 chmod +x "${RUN_SCRIPT}"
 echo "  Wrote: ${RUN_SCRIPT}"
