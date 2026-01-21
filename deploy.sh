@@ -8,8 +8,8 @@ set -euo pipefail
 SCRIPT_NAME="$(basename "${BASH_SOURCE[0]}")"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="${SCRIPT_DIR}"
-ONEARTH_SRC="${PROJECT_ROOT}/onearth"
-PATCH_DIR="${PROJECT_ROOT}/patches"
+ONEARTH_SRC="${PROJECT_ROOT}/onearth/repo"
+PATCH_DIR="${PROJECT_ROOT}/onearth/patches"
 
 usage() {
   echo "Usage: ${SCRIPT_NAME} <destination-dir>"
@@ -44,7 +44,7 @@ LOCAL_DEPLOY_DIR="${DEST_DIR_ABS}/docker/local-deployment"
 
 # Copy onearth repo
 echo "Copying onearth to ${DEST_DIR_ABS}..."
-cp -r "${ONEARTH_SRC}"/* "${DEST_DIR_ABS}/"
+cp -r "${ONEARTH_SRC}"/. "${DEST_DIR_ABS}/"
 
 # Validate local deployment directory presence in copied repo
 if [ ! -d "${LOCAL_DEPLOY_DIR}" ]; then
