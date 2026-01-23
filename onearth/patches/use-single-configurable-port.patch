@@ -1,0 +1,301 @@
+diff --git a/doc/local_deployment.md b/doc/local_deployment.md
+index 258f2cae..ac263cf5 100644
+--- a/doc/local_deployment.md
++++ b/doc/local_deployment.md
+@@ -132,9 +132,15 @@ Deploy OnEarth services using the setup script:
+ #### Deployment Options
+ 
+ ```bash
+-# Basic deployment (builds missing images only).
++# Basic deployment (builds missing images only, uses port 80)
+ ./setup-onearth-local.sh
+ 
++# Deploy on a custom port (e.g., for development instance)
++./setup-onearth-local.sh --port 8080
++
++# Deploy on port 3000 for laptop testing
++./setup-onearth-local.sh --port 3000 --no-build
++
+ # Force rebuild all images
+ ./setup-onearth-local.sh --force-build-all
+ 
+@@ -163,6 +169,7 @@ If you've made code changes to any of the images, you will need to run `./setup-
+ - `-m, --mrf-archive DIR` - MRF archive directory
+ - `-p, --shp-archive DIR` - Shapefile archive directory
+ - `-c, --config DIR` - Configuration directory
++- `--port PORT` - Host port for OnEarth service (default: 80)
+ - `-b, --build` - Force rebuild all Docker images
+ - `--build-deps` - Rebuild only base dependencies
+ - `-s, --service SERVICES` - Rebuild specified services (space-separated)
+@@ -182,14 +189,37 @@ The configuration generation script automatically updates layer configurations w
+ 
+ ## Deployed Services
+ 
+-The local deployment creates the following Docker services:
++The local deployment creates the following Docker services, all accessible through a single entry point:
++
++- **onearth-demo** - Main entry point (configurable port, default: 80)
++  - Proxies all requests to appropriate backend services
++  - Serves interactive demo page with endpoint testing
++  - Routes WMTS, TWMS, and WMS requests to backend services
++
++Backend services (internal Docker network only, not directly accessible from host):
++- **onearth-tile-services** - WMTS/TWMS tile serving
++- **onearth-capabilities** - GetCapabilities and metadata services
++- **onearth-time-service** - Time dimension support (Redis)
++- **onearth-reproject** - On-the-fly reprojection service
++- **onearth-wms** - WMS service
+ 
+-- **onearth-demo** (port 80) - Interactive demo page with endpoint testing
+-- **onearth-capabilities** (port 8081) - WMTS GetCapabilities and metadata services
+-- **onearth-tile-services** (port 443) - WMTS tile serving
+-- **onearth-time-service** (port 6379) - Time dimension support
+-- **onearth-reproject** (port 8082) - On-the-fly reprojection service
+-- **onearth-wms** (port 8443) - WMS service
++### Multiple Instance Deployment
++
++You can run multiple OnEarth instances on the same host by using different ports:
++
++```bash
++# Production instance on port 80
++./setup-onearth-local.sh --port 80
++
++# Development instance on port 8080 (in different terminal/directory)
++cd /path/to/dev/onearth
++./docker/local-deployment/setup-onearth-local.sh --port 8080
++
++# Laptop/testing instance on port 3000
++./setup-onearth-local.sh --port 3000
++```
++
++Each instance operates independently with its own containers and can use different data directories.
+ 
+ ### Volume Mounts
+ 
+@@ -202,20 +232,26 @@ Docker containers mount the following volumes:
+ 
+ ### Service Verification
+ 
+-Test deployed services using the following endpoints:
++Test deployed services using the following endpoints (replace `PORT` with your configured port, default is 80):
+ 
+ ```bash
+ # WMTS GetCapabilities
+-curl 'http://localhost/wmts/{PROJECTION}/1.0.0/WMTSCapabilities.xml'
++curl 'http://localhost:PORT/wmts/{PROJECTION}/1.0.0/WMTSCapabilities.xml'
+ 
+ # WMTS tile request
+-curl 'http://localhost/wmts/{PROJECTION}/1.0.0/{LAYER_ID}/default/{TIME}/{TILEMATRIXSET}/{Z}/{Y}/{X}.jpg'
++curl 'http://localhost:PORT/wmts/{PROJECTION}/1.0.0/{LAYER_ID}/default/{TIME}/{TILEMATRIXSET}/{Z}/{Y}/{X}.jpg'
+ 
+ # WMS GetCapabilities
+-curl 'http://localhost/wms/{PROJECTION}?SERVICE=WMS&REQUEST=GetCapabilities'
++curl 'http://localhost:PORT/wms/{PROJECTION}?SERVICE=WMS&REQUEST=GetCapabilities'
+ 
+ # Interactive demo page
++http://localhost:PORT/demo/
++
++# Examples for default port 80:
+ http://localhost/demo/
++
++# Examples for custom port (e.g., 8080):
++http://localhost:8080/demo/
+ ```
+ 
+ ## Troubleshooting
+@@ -284,4 +320,4 @@ For detailed troubleshooting, examine the following log files:
+ 
+ ## Script Execution Context
+ 
+-Both `setup-onearth-local.sh` and `generate-configs.sh` can be executed from either the `docker/local-deployment/` directory or the project root. The scripts automatically detect their execution context and adjust paths accordingly.
+\ No newline at end of file
++Both `setup-onearth-local.sh` and `generate-configs.sh` can be executed from either the `docker/local-deployment/` directory or the project root. The scripts automatically detect their execution context and adjust paths accordingly.
+diff --git a/docker/local-deployment/README.md b/docker/local-deployment/README.md
+index 9319e551..24fb76ee 100644
+--- a/docker/local-deployment/README.md
++++ b/docker/local-deployment/README.md
+@@ -8,9 +8,12 @@ This directory contains scripts and configuration files for deploying OnEarth lo
+ # Generate configurations for your projections
+ ./generate-configs.sh epsg4326 epsg3857
+ 
+-# Deploy OnEarth services
++# Deploy OnEarth services (default: port 80)
+ ./setup-onearth-local.sh
+ 
++# Deploy on a different port (e.g., for dev instance)
++./setup-onearth-local.sh --port 8080
++
+ # Complete cleanup when done
+ ./setup-onearth-local.sh --teardown
+ ```
+@@ -32,4 +35,4 @@ For complete setup instructions, configuration options, and troubleshooting guid
+ - `templates/` - Configuration templates
+ - `local-mrf-archive/` - Your MRF data (create this)
+ - `local-shp-archive/` - Your shapefile data (create this if you want to serve vectors via WMS)
+-- `onearth-configs/` - Generated configurations (created by scripts)
+\ No newline at end of file
++- `onearth-configs/` - Generated configurations (created by scripts)
+diff --git a/docker/local-deployment/docker-compose.local.yml b/docker/local-deployment/docker-compose.local.yml
+index 72b79753..5d67f662 100644
+--- a/docker/local-deployment/docker-compose.local.yml
++++ b/docker/local-deployment/docker-compose.local.yml
+@@ -17,8 +17,6 @@ services:
+     hostname: onearth-time-service
+     platform: ${DOCKER_PLATFORM_OPTION}
+     image: nasagibs/onearth-time-service:${ONEARTH_IMAGE_TAG}
+-    ports: 
+-      - 6379:6379
+     depends_on:
+       onearth-deps:
+         condition: service_completed_successfully
+@@ -45,8 +43,6 @@ services:
+     hostname: onearth-tile-services
+     platform: ${DOCKER_PLATFORM_OPTION}
+     image: nasagibs/onearth-tile-services:${ONEARTH_IMAGE_TAG}
+-    ports:
+-      - 443:443
+     depends_on:
+       onearth-deps:
+         condition: service_completed_successfully
+@@ -76,8 +72,6 @@ services:
+     hostname: onearth-capabilities
+     platform: ${DOCKER_PLATFORM_OPTION}
+     image: nasagibs/onearth-capabilities:${ONEARTH_IMAGE_TAG}
+-    ports: 
+-      - 8081:80
+     depends_on:
+       onearth-deps:
+         condition: service_completed_successfully
+@@ -103,8 +97,6 @@ services:
+     hostname: onearth-reproject
+     platform: ${DOCKER_PLATFORM_OPTION}
+     image: nasagibs/onearth-reproject:${ONEARTH_IMAGE_TAG}
+-    ports: 
+-      - 8082:80
+     depends_on:
+       onearth-deps:
+         condition: service_completed_successfully
+@@ -135,8 +127,6 @@ services:
+     hostname: onearth-wms
+     platform: ${DOCKER_PLATFORM_OPTION}
+     image: nasagibs/onearth-wms:${ONEARTH_IMAGE_TAG}
+-    ports: 
+-      - 8443:443
+     depends_on:
+       onearth-deps:
+         condition: service_completed_successfully
+@@ -173,7 +163,7 @@ services:
+     platform: ${DOCKER_PLATFORM_OPTION}
+     image: nasagibs/onearth-demo:${ONEARTH_IMAGE_TAG}
+     ports:
+-      - 80:80
++      - ${ONEARTH_PORT:-80}:80
+     depends_on:
+       onearth-deps:
+         condition: service_completed_successfully
+@@ -224,4 +214,4 @@ services:
+ 
+ networks:
+   oe2:
+-    driver: bridge 
+\ No newline at end of file
++    driver: bridge 
+diff --git a/docker/local-deployment/setup-onearth-local.sh b/docker/local-deployment/setup-onearth-local.sh
+index 50399b4b..96da1552 100755
+--- a/docker/local-deployment/setup-onearth-local.sh
++++ b/docker/local-deployment/setup-onearth-local.sh
+@@ -41,6 +41,7 @@ show_usage() {
+     echo "  -m, --mrf-archive DIR     MRF archive directory (default: local-mrf-archive)"
+     echo "  -p, --shp-archive DIR     SHP archive directory (default: local-shp-archive)"
+     echo "  -c, --config DIR          Configuration directory (default: onearth-configs)"
++    echo "  --port PORT               Host port for OnEarth service (default: 80)"
+     echo "  -b, --force-build-all     Force rebuild all Docker images"
+     echo "  --build-deps              Force rebuild only dependencies (onearth-deps)"
+     echo "  -s, --service SERVICES    Rebuild only the specified service(s) (space-separated)"
+@@ -67,6 +68,8 @@ show_usage() {
+     echo "  $0 --build-deps           # Only rebuild dependencies"
+     echo "  $0 --service tile-services # Rebuild just tile-services"
+     echo "  $0 --service \"tile-services capabilities\" # Rebuild multiple services"
++    echo "  $0 --port 8080            # Run on port 8080 (e.g., for dev instance)"
++    echo "  $0 --port 3000 --no-build # Run on port 3000 using existing images"
+     echo "  $0 -m my-MRFs -p my-shapefiles -c my-configs --service \"wms reproject\""
+     echo "  $0 --teardown             # Stop and remove all OnEarth containers"
+     exit 1
+@@ -78,6 +81,8 @@ BUILD_SERVICE=""
+ NO_BUILD=false
+ TEARDOWN=false
+ VERSION_ONLY=false
++# Honor pre-set ONEARTH_PORT if provided, otherwise default to 80
++ONEARTH_PORT=${ONEARTH_PORT:-80}
+ 
+ # Parse arguments
+ while [[ $# -gt 0 ]]; do
+@@ -94,6 +99,10 @@ while [[ $# -gt 0 ]]; do
+             CONFIG_DIR="$2"
+             shift 2
+             ;;
++        --port)
++            ONEARTH_PORT="$2"
++            shift 2
++            ;;
+         -b|--force-build-all)
+             FORCE_BUILD=true
+             shift
+@@ -192,6 +201,7 @@ echo "📁 Using directories:"
+ echo "   MRF Archive: $MRF_ARCHIVE_DIR"
+ echo "   SHP Archive: $SHP_ARCHIVE_DIR"
+ echo "   Configurations: $CONFIG_DIR"
++echo "   Host Port: $ONEARTH_PORT"
+ echo ""
+ 
+ # Check if Docker is running
+@@ -255,6 +265,7 @@ export DOCKER_PLATFORM_OPTION=$(uname -m | grep -qE 'aarch64|arm64' && echo "lin
+ export USE_SSL=false  # Disable SSL for local development
+ export SERVER_NAME=localhost
+ export DEBUG_LOGGING=true  # Enable debug logging for local development
++export ONEARTH_PORT  # Export for docker-compose to use
+ export MRF_ARCHIVE_DIR  # Export for docker-compose to use
+ export SHP_ARCHIVE_DIR  # Export for docker-compose to use
+ export CONFIG_DIR  # Export for docker-compose to use
+@@ -472,30 +483,30 @@ echo "=========================================="
+ echo ""
+ 
+ # Display service access points
++LOCALHOST_URL="http://localhost"
++if [ "$ONEARTH_PORT" != "80" ]; then
++    LOCALHOST_URL="http://localhost:${ONEARTH_PORT}"
++fi
++
+ echo "🌐 Your OnEarth Services:"
+ echo ""
+-echo "📊 Demo Interface:"
+-echo "   http://localhost"
++echo "📊 Main Entry Point:"
++echo "   ${LOCALHOST_URL}"
+ echo ""
+-
+-echo "🔧 Individual Services:"
+-echo "   • Tile Services:    https://localhost (port 443)"
+-echo "   • Capabilities:      http://localhost:8081"
+-echo "   • Reproject:         http://localhost:8082"
+-echo "   • WMS Service:       https://localhost:8443"
+-echo "   • Time Service:      Redis on port 6379"
++echo "   All services (WMTS, TWMS, WMS, GetCapabilities) are accessible"
++echo "   through this single endpoint via the demo container proxy."
+ echo ""
+ 
+ echo "📋 Viewing Logs:"
+ echo "   OnEarth config logs:  docker exec [service-name] cat /var/log/onearth/config.log"
+ echo "   Apache error logs:    docker exec [service-name] cat /var/log/httpd/error_log"
+ echo "   WMS MapServer logs:   docker exec [service-name] cat /var/log/mapserver/error.log"
+-echo "   Demo container logs:  docker exec [service-name] cat /var/log/httpd/error_log"
++echo "   Demo container logs:  docker exec onearth-demo cat /var/log/httpd/error_log"
+ echo ""
+ 
+ echo "📝 Testing Your Setup:"
+ echo "   # Interactive demo page with all endpoints"
+-echo "   http://localhost/demo/"
++echo "   ${LOCALHOST_URL}/demo/"
+ echo ""
+ 
+ echo "🔍 If you encounter issues:"

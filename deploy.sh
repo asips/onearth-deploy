@@ -14,16 +14,17 @@ ONEARTH_SRC="${PROJECT_ROOT}/onearth/repo"
 PATCH_DIR="${PROJECT_ROOT}/onearth/patches"
 
 usage() {
-  echo "Usage: ONEARTH_DEPLOY_DIR=/path/to/deploy MRF_ARCHIVE_DIR=/path/to/mrf SHP_ARCHIVE_DIR=/path/to/shp ${SCRIPT_NAME}"
+  echo "Usage: ONEARTH_DEPLOY_DIR=/path/to/deploy MRF_ARCHIVE_DIR=/path/to/mrf SHP_ARCHIVE_DIR=/path/to/shp ONEARTH_PORT=8080 ${SCRIPT_NAME}"
   echo ""
   echo "Required environment variables:"
   echo "  ONEARTH_DEPLOY_DIR - destination directory (must not exist)"
   echo "  MRF_ARCHIVE_DIR    - path to MRF archive directory"
   echo "  SHP_ARCHIVE_DIR    - path to shapefile archive directory"
+  echo "  ONEARTH_PORT       - port for OnEarth services"
 }
 
 # Check required environment variables
-if [ -z "${ONEARTH_DEPLOY_DIR:-}" ] || [ -z "${MRF_ARCHIVE_DIR:-}" ] || [ -z "${SHP_ARCHIVE_DIR:-}" ]; then
+if [ -z "${ONEARTH_DEPLOY_DIR:-}" ] || [ -z "${MRF_ARCHIVE_DIR:-}" ] || [ -z "${SHP_ARCHIVE_DIR:-}" ] || [ -z "${ONEARTH_PORT:-}" ]; then
   echo "ERROR: Missing required environment variables"
   usage
   exit 2
@@ -140,7 +141,8 @@ export COMPOSE_FILE=docker-compose.local.yml
 # Archive directories
 export MRF_ARCHIVE_DIR="${MRF_ARCHIVE_ABS}"
 export SHP_ARCHIVE_DIR="${SHP_ARCHIVE_ABS}"
-
+# OnEarth port
+export ONEARTH_PORT="${ONEARTH_PORT}"
 exec docker compose "\$@"
 EOF
 chmod +x "${RUN_SCRIPT}"
