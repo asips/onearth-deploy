@@ -1,5 +1,5 @@
 diff --git a/docker/local-deployment/docker-compose.local.yml b/docker/local-deployment/docker-compose.local.yml
-index 5d67f662..d77aca16 100644
+index 5d67f662..505db9dc 100644
 --- a/docker/local-deployment/docker-compose.local.yml
 +++ b/docker/local-deployment/docker-compose.local.yml
 @@ -17,9 +17,9 @@ services:
@@ -15,7 +15,15 @@ index 5d67f662..d77aca16 100644
      build:
        args: 
          ONEARTH_VERSION: $ONEARTH_VERSION
-@@ -38,14 +38,15 @@ services:
+@@ -31,21 +31,22 @@ services:
+     environment: 
+       DEBUG_LOGGING: $DEBUG_LOGGING
+       S3_URL: /onearth/mrf-archive
+-      FORCE_TIME_SCRAPE: true
++      FORCE_TIME_SCRAPE: "true"
+     networks:
+       - oe2
+     restart: always
      volumes:
        - ${CONFIG_DIR:-./onearth-configs}/config:/etc/onearth/config
        - ${MRF_ARCHIVE_DIR:-./local-mrf-archive}:/onearth/mrf-archive:ro
@@ -34,7 +42,13 @@ index 5d67f662..d77aca16 100644
      build:
        args: 
          ONEARTH_VERSION: $ONEARTH_VERSION
-@@ -64,6 +65,7 @@ services:
+@@ -59,11 +60,12 @@ services:
+       SERVER_NAME: $SERVER_NAME
+       DEBUG_LOGGING: $DEBUG_LOGGING
+       S3_URL: /onearth/mrf-archive
+-      IDX_SYNC: true
++      IDX_SYNC: "true"
+     volumes: 
        - ./certs:/home/oe2/onearth/certs
        - ${CONFIG_DIR:-./onearth-configs}/config:/etc/onearth/config
        - ${MRF_ARCHIVE_DIR:-./local-mrf-archive}:/onearth/mrf-archive:ro
