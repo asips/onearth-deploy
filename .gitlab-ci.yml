@@ -2,6 +2,7 @@ deploy:
   only:
     - main
   variables:
+    GIT_SUBMODULE_STRATEGY: recursive
     ONEARTH_DEPLOY_FORCE: "true"
     ONEARTH_DEPLOY_DIR: "/home/gregq/deployed/onearth"
     MRF_ARCHIVE_DIR: "/data/gregq/onearth/mrf-archive"
