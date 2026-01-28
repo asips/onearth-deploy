@@ -21,6 +21,9 @@ usage() {
   echo "  MRF_ARCHIVE_DIR    - path to MRF archive directory"
   echo "  SHP_ARCHIVE_DIR    - path to shapefile archive directory"
   echo "  ONEARTH_PORT       - port for OnEarth services"
+  echo ""
+  echo "Optional environment variables:"
+  echo "  ONEARTH_DEPLOY_FORCE - set to 'true' to teardown and remove existing deployment"
 }
 
 # Check required environment variables
@@ -49,10 +52,26 @@ if [ ! -d "${SHP_ARCHIVE_DIR}" ]; then
   exit 1
 fi
 
-# Ensure destination does not exist
+# Handle existing deployment
 if [ -e "${DEST_DIR}" ]; then
-  echo "ERROR: Destination already exists: ${DEST_DIR}"
-  exit 1
+  if [ "${ONEARTH_DEPLOY_FORCE:-}" != "true" ]; then
+    echo "ERROR: Destination already exists: ${DEST_DIR}"
+    echo "To teardown and redeploy, set ONEARTH_DEPLOY_FORCE=true"
+    echo "Or manually remove the deployment: ONEARTH_DEPLOY_DIR=${DEST_DIR} ${SCRIPT_DIR}/remove.sh"
+    exit 1
+  fi
+  
+  echo "Existing deployment detected at ${DEST_DIR}"
+  echo "ONEARTH_DEPLOY_FORCE=true, calling remove.sh..."
+  echo ""
+  
+  # Call remove.sh to teardown existing deployment
+  if ! ONEARTH_DEPLOY_DIR="${DEST_DIR}" "${SCRIPT_DIR}/remove.sh"; then
+    echo "ERROR: Failed to remove existing deployment"
+    exit 1
+  fi
+  
+  echo ""
 fi
 
 # Create destination directory (and parents) so copy succeeds
