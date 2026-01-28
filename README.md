@@ -4,9 +4,10 @@ This repository manages the configuration and deployment of OnEarth for the NURT
 
 ## Overview
 
-The repository contains:
+This repository automates deployment of the NASA OnEarth tile server using Docker Compose via the **local-deployment setup** included in the OnEarth repository. It manages:
+
 - **Layer configurations** in YAML format (organized by projection)
-- **OnEarth source code** as a git submodule (currently pinned to v2.9.2)
+- **OnEarth source code** as a git submodule (pinned to v2.9.2), with custom patches applied
 - **Deployment scripts** for automated setup and teardown
 - **GitLab CI/CD** pipeline for automatic deployment on commits to `main`
 
@@ -67,12 +68,39 @@ Developers can test configuration and layer changes locally before deploying to 
    ./remove.sh
    ```
 
+### Managing the Deployment
+
+The deployment directory created by `deploy.sh` contains a `run-docker-compose.sh` wrapper script that manages the OnEarth services. This script is pre-configured with all necessary environment variables (mount paths, ports, etc.), so you can manage containers without manually setting variables:
+
+```bash
+cd ${ONEARTH_DEPLOY_DIR}/docker/local-deployment
+
+# View logs
+./run-docker-compose.sh logs -f onearth-tile-services
+
+# Stop services (without removing them)
+./run-docker-compose.sh stop
+
+# Start stopped services
+./run-docker-compose.sh start
+```
+
 ## Adding or Modifying Layers
 
 1. Create or edit a YAML file in `layers/{PROJECTION}/all/` with your layer configuration
 2. Place corresponding MRF data in `local/data/mrf-archive/{PROJECTION}/{LAYER_NAME}/`
 3. Redeploy locally using `./deploy.sh` to test changes
 4. Commit changes to Git
+
+## Patching
+
+Custom patches are applied to the OnEarth source code during deployment. Currently applied patches:
+
+1. **1-fix-layer-counter-increments.patch** - Fixes layer counter increment logic
+2. **2-use-single-configurable-port.patch** - Allows configuring OnEarth port via `ONEARTH_PORT` environment variable
+3. **3-podman-hacks.patch** - Compatibility adjustments for podman
+
+Patches are automatically applied by `deploy.sh` before configuration generation. To modify or add patches, edit the `.patch` files in the `onearth/patches/` directory.
 
 ## Deployment to Production
 
