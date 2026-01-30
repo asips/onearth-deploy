@@ -138,34 +138,94 @@ echo "Running setup-onearth-local (opinionated defaults)..."
 ( cd "${LOCAL_DEPLOY_DIR}" && bash ./setup-onearth-local.sh --no-build --version-only )
 
 echo ""
-echo "Creating docker compose wrapper script..."
-RUN_SCRIPT="${LOCAL_DEPLOY_DIR}/run-docker-compose.sh"
-cat > "${RUN_SCRIPT}" <<EOF
+echo "Creating shared environment file..."
+ENV_SCRIPT="${LOCAL_DEPLOY_DIR}/env-docker.sh"
+cat > "${ENV_SCRIPT}" <<'EOF'
 #!/usr/bin/env bash
-# run-docker-compose.sh - set env vars (like setup-onearth-local.sh does) then run docker compose
+# env-docker.sh - Shared environment setup for docker compose wrapper scripts
 
 set -euo pipefail
 
 source ../../version.sh
-export DOCKER_PLATFORM_OPTION=\$(uname -m | grep -qE 'aarch64|arm64' && echo "linux/amd64" || echo "")
-export USE_SSL=false  # Disable SSL for local development
+export DOCKER_PLATFORM_OPTION=$(uname -m | grep -qE 'aarch64|arm64' && echo "linux/amd64" || echo "")
+export USE_SSL=false
 export SERVER_NAME=localhost
-export DEBUG_LOGGING=true  # Enable debug logging for local development
-export ONEARTH_DEPS_TAG=nasagibs/onearth-deps:\${ONEARTH_VERSION}
-export ONEARTH_IMAGE_TAG=\${ONEARTH_VERSION}
+export DEBUG_LOGGING=true
+export ONEARTH_DEPS_TAG=nasagibs/onearth-deps:${ONEARTH_VERSION}
+export ONEARTH_IMAGE_TAG=${ONEARTH_VERSION}
 export START_ONEARTH_TOOLS_CONTAINER=0
 export COMPOSE_PROJECT_NAME=onearth
 export COMPOSE_FILE=docker-compose.local.yml
-
-# Archive directories
+EOF
+cat >> "${ENV_SCRIPT}" <<EOF
 export MRF_ARCHIVE_DIR="${MRF_ARCHIVE_ABS}"
 export SHP_ARCHIVE_DIR="${SHP_ARCHIVE_ABS}"
-# OnEarth port
 export ONEARTH_PORT="${ONEARTH_PORT}"
-exec docker compose "\$@"
+EOF
+chmod +x "${ENV_SCRIPT}"
+echo "  Wrote: ${ENV_SCRIPT}"
+
+echo ""
+echo "Creating docker compose wrapper script..."
+RUN_SCRIPT="${LOCAL_DEPLOY_DIR}/run-docker-compose.sh"
+cat > "${RUN_SCRIPT}" <<'EOF'
+#!/usr/bin/env bash
+# run-docker-compose.sh - Wrapper for docker compose with OnEarth environment
+
+set -euo pipefail
+
+source "$(dirname "${BASH_SOURCE[0]}")/env-docker.sh"
+exec docker compose "$@"
 EOF
 chmod +x "${RUN_SCRIPT}"
 echo "  Wrote: ${RUN_SCRIPT}"
+
+echo ""
+echo "Creating MRF data refresh script..."
+REFRESH_SCRIPT="${LOCAL_DEPLOY_DIR}/refresh-mrf-data.sh"
+cat > "${REFRESH_SCRIPT}" <<'EOF'
+#!/usr/bin/env bash
+# refresh-mrf-data.sh - Refresh MRF data without redeployment
+# Syncs IDX files and rescans time data after adding new MRF files to the archive
+
+set -euo pipefail
+
+source "$(dirname "${BASH_SOURCE[0]}")/env-docker.sh"
+
+# Ensure compose file and project are set
+COMPOSE_OPTS=(-f "${COMPOSE_FILE}" -p "${COMPOSE_PROJECT_NAME}")
+
+echo "Refreshing MRF data..."
+echo ""
+
+# Sync IDX files from archive to tile-services container
+echo "Step 1: Syncing IDX files from archive..."
+COMPOSE_CMD=("${COMPOSE_OPTS[@]}" exec -T onearth-tile-services python3 /usr/bin/oe_sync_s3_idx.py -b /onearth/mrf-archive -d /onearth/idx -p epsg4326 -p epsg3857 -p epsg3031 -p epsg3413)
+if docker compose "${COMPOSE_CMD[@]}" 2>/dev/null; then
+  echo "✓ IDX files synced successfully"
+else
+  echo "✗ Failed to sync IDX files"
+  exit 1
+fi
+
+echo ""
+
+# Rescrape time data in time-service container
+echo "Step 2: Rescanning MRF files and updating time service database..."
+COMPOSE_CMD=("${COMPOSE_OPTS[@]}" exec -T onearth-time-service python3 /usr/bin/oe_scrape_time.py -r -s /onearth/mrf-archive 127.0.0.1)
+if docker compose "${COMPOSE_CMD[@]}" 2>/dev/null; then
+  echo "✓ Time service database updated successfully"
+else
+  echo "✗ Failed to update time service database"
+  exit 1
+fi
+
+echo ""
+echo "✅ MRF data refresh complete"
+EOF
+chmod +x "${REFRESH_SCRIPT}"
+echo "  Wrote: ${REFRESH_SCRIPT}"
+
 echo ""
 echo "✅ Deployment directory prepared at ${DEST_DIR_ABS}"
 echo ""
