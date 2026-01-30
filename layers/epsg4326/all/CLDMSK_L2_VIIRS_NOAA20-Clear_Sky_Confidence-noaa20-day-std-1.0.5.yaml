@@ -7,7 +7,7 @@ mime_type: "image/png"
 static: false
 abstract: "Clear Sky Confidence Day (Version 1.0.5)"
 time_config:
-- "DETECT/DETECT/P1D"
+- "DETECT/P1D"
 best_layer: CLDMSK_L2_VIIRS_NOAA20-Clear_Sky_Confidence-noaa20-day-std-1.0.5
 
 metadata:

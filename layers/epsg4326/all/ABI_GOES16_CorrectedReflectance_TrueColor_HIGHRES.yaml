@@ -7,7 +7,7 @@ mime_type: "image/jpeg"
 static: false
 abstract: "ABI GOES16 Corrected Reflectance True Color HIGHRES"
 time_config:
-- "DETECT/DETECT/PT10M"
+- "DETECT/PT10M"
 best_layer: "ABI_GOES16_CorrectedReflectance_TrueColor_HIGHRES"
 metadata: []
 source_mrf:

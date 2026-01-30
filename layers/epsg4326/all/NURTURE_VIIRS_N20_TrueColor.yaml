@@ -7,7 +7,7 @@ mime_type: "image/jpeg"
 static: false
 abstract: "NURTURE VIIRS N20 True Color processed for NURTURE"
 time_config:
-- "DETECT/DETECT/PT120M"
+- "DETECT/PT120M"
 best_layer: "NURTURE_VIIRS_N20_TrueColor"
 metadata: []
 source_mrf:
