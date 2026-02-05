@@ -18,4 +18,4 @@ source_mrf:
   bbox: "-180,-90,180,90"
   empty_tile: "/etc/onearth/empty_tiles/Blank_RGB_512.jpg"
   idx_path: "/onearth/idx/epsg4326/NURTURE_RangeRings/NURTURE_RangeRings.idx"
-  data_file_uri: "/onearth/mrf-archive/epsg4326/NURTURE_RangeRings/NURTURE_RangeRings.idx"
+  data_file_uri: "/onearth/mrf-archive/epsg4326/NURTURE_RangeRings/NURTURE_RangeRings.mrf"
