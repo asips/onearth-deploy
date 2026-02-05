@@ -16,6 +16,6 @@ source_mrf:
   tile_size_y: 512
   year_dir: false
   bbox: "-180,-90,180,90"
-  empty_tile: "/etc/onearth/empty_tiles/Blank_RGB_512.jpg"
+  empty_tile: "/etc/onearth/empty_tiles/Blank_RGBA_512.png"
   idx_path: "/onearth/idx/epsg4326/NURTURE_RangeRings/NURTURE_RangeRings.idx"
   data_file_uri: "/onearth/mrf-archive/epsg4326/NURTURE_RangeRings/NURTURE_RangeRings.ppg"
