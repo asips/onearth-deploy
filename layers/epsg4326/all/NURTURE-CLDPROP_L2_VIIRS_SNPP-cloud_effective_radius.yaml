@@ -1,0 +1,31 @@
+layer_id: "NURTURE-CLDPROP_L2_VIIRS_SNPP-cloud_effective_radius"
+layer_title: "NURTURE-CLDPROP_L2_VIIRS_SNPP-cloud_effective_radius"
+layer_name: "NURTURE-CLDPROP_L2_VIIRS_SNPP-cloud_effective_radius"
+projection: "EPSG:4326"
+tilematrixset: "1km"
+mime_type: "image/png"
+static: false
+abstract: "NURTURE-CLDPROP_L2_VIIRS_SNPP-cloud_effective_radius"
+time_config:
+- "DETECT/PT10M"
+best_layer: "NURTURE-CLDPROP_L2_VIIRS_SNPP-cloud_effective_radius"
+
+metadata:
+- {
+      "xlink:type": "simple",
+      "xlink:role": "http://earthdata.nasa.gov/gibs/metadata-type/colormap",
+      "xlink:href": "https://sips.ssec.wisc.edu/onearth/colormaps/v1.0/Cloud_Effective_Radius.colormap.xml",
+      "xlink:title": "Color Map: Data - RGB Mapping",
+  }
+
+source_mrf:
+  size_x: 40960
+  size_y: 20480
+  bands: 1
+  tile_size_x: 512
+  tile_size_y: 512
+  year_dir: true
+  bbox: "-180,-90,180,90"
+  empty_tile: "/etc/onearth/empty_tiles/Blank_RGBA_512.png"
+  idx_path: "/onearth/idx/epsg4326"
+  data_file_uri: "/onearth/mrf-archive/epsg4326"
