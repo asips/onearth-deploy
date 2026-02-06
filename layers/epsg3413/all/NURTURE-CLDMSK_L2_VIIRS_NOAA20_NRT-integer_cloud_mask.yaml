@@ -1,0 +1,31 @@
+layer_id: "NURTURE-CLDMSK_L2_VIIRS_NOAA20_NRT-integer_cloud_mask"
+layer_title: "NURTURE-CLDMSK_L2_VIIRS_NOAA20_NRT-integer_cloud_mask"
+layer_name: "NURTURE-CLDMSK_L2_VIIRS_NOAA20_NRT-integer_cloud_mask"
+projection: "EPSG:3413"
+tilematrixset: "1km"
+mime_type: "image/png"
+static: false
+abstract: "NURTURE-CLDMSK_L2_VIIRS_NOAA20_NRT-integer_cloud_mask"
+time_config:
+- "DETECT/PT10M"
+best_layer: "NURTURE-CLDMSK_L2_VIIRS_NOAA20_NRT-integer_cloud_mask"
+
+metadata:
+- {
+      "xlink:type": "simple",
+      "xlink:role": "http://earthdata.nasa.gov/gibs/metadata-type/colormap",
+      "xlink:href": "https://sips.ssec.wisc.edu/onearth/colormaps/v1.0/CLDMSK_L2_VIIRS_SNPP.Integer_Cloud_Mask.colormap.xml",
+      "xlink:title": "Color Map: Data - RGB Mapping",
+  }
+
+source_mrf:
+  size_x: 8192
+  size_y: 8192
+  bands: 1
+  tile_size_x: 512
+  tile_size_y: 512
+  year_dir: true
+  bbox: "-4194304,-4194304,4194304,4194304"
+  empty_tile: "/etc/onearth/empty_tiles/Blank_RGBA_512.png"
+  idx_path: "/onearth/idx/epsg3413"
+  data_file_uri: "/onearth/mrf-archive/epsg3413"
