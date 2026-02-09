@@ -17,5 +17,5 @@ source_mrf:
   year_dir: false
   bbox: "-180,-90,180,90"
   empty_tile: "/etc/onearth/empty_tiles/Blank_RGBA_512.png"
-  idx_path: "/onearth/idx/epsg4326/NURTURE-range_rings/NURTURE-range_rings.idx"
+  idx_path: "/onearth/mrf-archive/epsg4326/NURTURE-range_rings/NURTURE-range_rings.idx"
   data_file_uri: "/onearth/mrf-archive/epsg4326/NURTURE-range_rings/NURTURE-range_rings.ppg"

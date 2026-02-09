@@ -19,5 +19,5 @@ source_mrf:
   year_dir: true
   bbox: "-180,-90,180,90"
   empty_tile: "/etc/onearth/empty_tiles/Blank_RGB_512.jpg"
-  idx_path: "/onearth/idx/epsg4326"
+  idx_path: "/onearth/mrf-archive/epsg4326"
   data_file_uri: "/onearth/mrf-archive/epsg4326"
