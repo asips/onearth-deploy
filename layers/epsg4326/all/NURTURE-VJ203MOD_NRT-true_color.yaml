@@ -1,0 +1,23 @@
+layer_id: "NURTURE-VJ203MOD_NRT-true_color"
+layer_title: "NURTURE-VJ203MOD_NRT-true_color"
+layer_name: "NURTURE-VJ203MOD_NRT-true_color"
+projection: "EPSG:4326"
+tilematrixset: "1km"
+mime_type: "image/png"
+static: false
+abstract: "NURTURE-VJ203MOD_NRT-true_color"
+time_config:
+- "DETECT/PT10M"
+best_layer: "NURTURE-VJ203MOD_NRT-true_color"
+metadata: []
+source_mrf:
+  size_x: 40960
+  size_y: 20480
+  bands: 1
+  tile_size_x: 512
+  tile_size_y: 512
+  year_dir: true
+  bbox: "-180,-90,180,90"
+  empty_tile: "/etc/onearth/empty_tiles/Blank_RGBA_512.png"
+  idx_path: "/onearth/mrf-archive/epsg4326"
+  data_file_uri: "/onearth/mrf-archive/epsg4326"
