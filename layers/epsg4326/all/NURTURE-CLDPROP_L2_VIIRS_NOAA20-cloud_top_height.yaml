@@ -14,7 +14,7 @@ metadata:
 - {
       "xlink:type": "simple",
       "xlink:role": "http://earthdata.nasa.gov/gibs/metadata-type/colormap",
-      "xlink:href": "https://sips.ssec.wisc.edu/onearth/colormaps/v1.0/Cloud_Top_Height.colormap",
+      "xlink:href": "https://sips.ssec.wisc.edu/onearth/colormaps/v1.0/Cloud_Top_Height.colormap.xml",
       "xlink:title": "Color Map: Data - RGB Mapping",
   }
 
