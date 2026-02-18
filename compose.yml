@@ -1,0 +1,116 @@
+# Docker / Podman Compose configuration for OnEarth
+#
+# This was derived from the "local deployment" compose file from the OnEarth v2.9.2 repository,
+# with modifications to:
+# - Address Podman compatibility issues
+# - Always use pre-built images from docker.io (no local builds)
+# - Make some services optional (disabled by default) via profiles
+# - Make host ports configurable via environment variables, and default to non-privileged ports
+# - Remove SSL support (assume users will add SSL via a reverse proxy)
+# - Set IDX_SYNC to false (only seems necessary if MRF archive is on S3)
+
+name: ${COMPOSE_PROJECT_NAME}
+services:
+
+  onearth-time-service:
+    image: docker.io/nasagibs/onearth-time-service:${ONEARTH_VERSION}
+    ports: 
+      - "${TIME_SERVICE_PORT:-6379}:6379"
+    environment: 
+      DEBUG_LOGGING: ${DEBUG_LOGGING:-false}
+      S3_URL: /onearth/mrf-archive
+      FORCE_TIME_SCRAPE: "true"
+    restart: always
+    volumes:
+      - ${CONFIG_DIR}:/etc/onearth/config:ro
+      - ${MRF_ARCHIVE_DIR}:/onearth/mrf-archive:ro
+      - ./compose.yml:/.dockerenv:ro  # Podman compatibility
+
+  onearth-tile-services:
+    image: docker.io/nasagibs/onearth-tile-services:${ONEARTH_VERSION}
+    ports:
+      - "${TILE_SERVICES_PORT:-8080}:80"
+    environment: 
+      USE_SSL: "false"
+      DEBUG_LOGGING: ${DEBUG_LOGGING:-false}
+      S3_URL: /onearth/mrf-archive
+      IDX_SYNC: "false"
+    volumes: 
+      - ${CONFIG_DIR}:/etc/onearth/config:ro
+      - ${MRF_ARCHIVE_DIR}:/onearth/mrf-archive:ro
+      - ./compose.yml:/.dockerenv:ro  # Podman compatibility
+    restart: always
+    depends_on:
+      - onearth-time-service
+
+  onearth-capabilities:
+    image: docker.io/nasagibs/onearth-capabilities:${ONEARTH_VERSION}
+    ports: 
+      - "${CAPABILITIES_PORT:-8081}:80"
+    environment: 
+      DEBUG_LOGGING: ${DEBUG_LOGGING:-false}
+      S3_URL: /onearth/mrf-archive
+    restart: always
+    volumes:
+      - ${CONFIG_DIR}:/etc/onearth/config:ro
+      - ${MRF_ARCHIVE_DIR}:/onearth/mrf-archive:ro
+      - ./compose.yml:/.dockerenv:ro  # Podman compatibility
+    depends_on:
+      - onearth-time-service
+
+  onearth-reproject:
+    image: docker.io/nasagibs/onearth-reproject:${ONEARTH_VERSION}
+    ports: 
+      - "${REPROJECT_PORT:-8082}:80"
+    environment: 
+      DEBUG_LOGGING: ${DEBUG_LOGGING:-false}
+    restart: always
+    volumes:
+      - ${CONFIG_DIR}:/etc/onearth/config:ro
+      - ${MRF_ARCHIVE_DIR}:/onearth/mrf-archive:ro
+      - ./compose.yml:/.dockerenv:ro  # Podman compatibility
+    depends_on:
+      - onearth-time-service
+      - onearth-tile-services
+      - onearth-capabilities
+    profiles:
+      - reproject
+
+  onearth-wms:
+    image: docker.io/nasagibs/onearth-wms:${ONEARTH_VERSION}
+    ports: 
+      - "${WMS_PORT:-8083}:80"
+    environment: 
+      USE_SSL: "false"
+      SERVER_NAME: ${SERVER_NAME:-localhost}
+      DEBUG_LOGGING: ${DEBUG_LOGGING:-false}
+      SHAPEFILE_BUCKET: /onearth/shp-archive
+    volumes: 
+      - ${CONFIG_DIR}:/etc/onearth/config:ro
+      - ${MRF_ARCHIVE_DIR}:/onearth/mrf-archive:ro
+      - ${SHP_ARCHIVE_DIR}:/onearth/shp-archive:ro
+      - ./compose.yml:/.dockerenv:ro  # Podman compatibility
+    restart: always
+    depends_on:
+      - onearth-time-service
+      - onearth-tile-services
+      - onearth-capabilities
+    profiles:
+      - wms
+
+  onearth-demo:
+    image: docker.io/nasagibs/onearth-demo:${ONEARTH_VERSION}
+    ports:
+      - "${DEMO_PORT:-8084}:80"
+    environment: 
+      DEBUG_LOGGING: ${DEBUG_LOGGING:-false}
+    volumes:
+      - ${CONFIG_DIR}:/etc/onearth/config:ro
+      - ./compose.yml:/.dockerenv:ro  # Podman compatibility
+    restart: always
+    depends_on:
+      - onearth-time-service
+      - onearth-tile-services
+      - onearth-capabilities
+    profiles:
+      - demo
