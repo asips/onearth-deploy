@@ -29,8 +29,8 @@ mkdir ${TMP_CONFIG_DIR}/config
 ln -s ${PWD}/layers ${TMP_CONFIG_DIR}/config/
 ( cd ${ONEARTH_SRC}/docker/local-deployment; ./generate-configs.sh -s ${TMP_CONFIG_DIR} -t ${DEPLOYMENT_DIR} epsg4326 epsg3413 )
 
-# copy in color maps and vector styles
-cp -r colormaps ${DEPLOYMENT_DIR}
+# copy in metadata files (we haven't added any colormaps yet so it's commented)
+# cp -r colormaps ${DEPLOYMENT_DIR}
 cp -r vector-styles ${DEPLOYMENT_DIR}
 cp -r vector-metadata ${DEPLOYMENT_DIR}
 
