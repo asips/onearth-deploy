@@ -1,0 +1,25 @@
+layer_id: "NURTURE-flight_track"
+layer_title: "NURTURE-flight_track"
+layer_name: "NURTURE-flight_track"
+projection: "EPSG:4326"
+tilematrixset: "1km"
+mime_type: "application/vnd.mapbox-vector-tile"
+static: false
+abstract: "NURTURE-flight_track"
+time_config:
+- "DETECT/PT1D"
+metadata:
+  - {"xlink:href": "http://nurture-onearth.ssec.wisc.edu/vector-styles/v1.0/NURTURE-flight_track.json", "xlink:role": "http://earthdata.nasa.gov/gibs/metadata-type/mapbox-gl-style/1.0", "xlink:title": "Mapbox GL Layer Styles", "xlink:type": "simple"}
+  - {"xlink:href": "http://nurture-onearth.ssec.wisc.edu/vector-styles/v1.0/NURTURE-flight_track.json", "xlink:role": "http://earthdata.nasa.gov/gibs/metadata-type/mapbox-gl-style/", "xlink:title": "Mapbox GL Layer Styles", "xlink:type": "simple"}
+  - {"xlink:href": "http://nurture-onearth.ssec.wisc.edu/vector-metadata/v1.0/NURTURE-flight_track.json", "xlink:role": "http://earthdata.nasa.gov/gibs/metadata-type/layer/1.0", "xlink:title": "Layer Vector Metadata", "xlink:type": "simple"}
+  - {"xlink:href": "http://nurture-onearth.ssec.wisc.edu/vector-metadata/v1.0/NURTURE-flight_track.json", "xlink:role": "http://earthdata.nasa.gov/gibs/metadata-type/layer/", "xlink:title": "Layer Vector Metadata", "xlink:type": "simple"}
+source_mrf:
+  size_x: 40960
+  size_y: 20480
+  bands: null
+  tile_size_x: 512
+  tile_size_y: 512
+  year_dir: true
+  bbox: "-180,-90,180,90"
+  idx_path: "/onearth/mrf-archive/epsg4326"
+  data_file_uri: "/onearth/mrf-archive/epsg4326"
