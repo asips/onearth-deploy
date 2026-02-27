@@ -2,11 +2,10 @@ deploy:
   only:
     - main
   variables:
-    GIT_SUBMODULE_STRATEGY: recursive
-    ONEARTH_DEPLOY_FORCE: "true"
-    ONEARTH_DEPLOY_DIR: "/home/gregq/deployed/onearth"
+    DEPLOYMENT_DIR: "/home/gregq/deployed/onearth"
+    ONEARTH_VERSION: "2.9.2"
     MRF_ARCHIVE_DIR: "/data/gregq/onearth/mrf-archive"
-    SHP_ARCHIVE_DIR: "/data/gregq/onearth/shp-archive"
-    ONEARTH_PORT: "3180"
+    FORCE_REDEPLOY: "true"
+    TILE_SERVICES_PORT: "3180"
   script:
     - ./deploy.sh

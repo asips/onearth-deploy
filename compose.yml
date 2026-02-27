@@ -8,6 +8,8 @@
 # - Make host ports configurable via environment variables, and default to non-privileged ports
 # - Remove SSL support (assume users will add SSL via a reverse proxy)
 # - Set IDX_SYNC to false (only seems necessary if MRF archive is on S3)
+# - Use bind mounts within DEPLOYMENT_DIR for configuration, colormaps, and vector layer
+#   styles & metadata
 
 name: ${COMPOSE_PROJECT_NAME}
 services:
@@ -22,21 +24,23 @@ services:
       FORCE_TIME_SCRAPE: "true"
     restart: always
     volumes:
-      - ${CONFIG_DIR}:/etc/onearth/config:ro
+      - ${DEPLOYMENT_DIR}/config:/etc/onearth/config:ro
       - ${MRF_ARCHIVE_DIR}:/onearth/mrf-archive:ro
       - ./compose.yml:/.dockerenv:ro  # Podman compatibility
 
   onearth-tile-services:
     image: docker.io/nasagibs/onearth-tile-services:${ONEARTH_VERSION}
     ports:
-      - "${TILE_SERVICES_PORT:-8080}:80"
+      - "${TILE_SERVICES_PORT:-8000}:80"
     environment: 
       USE_SSL: "false"
       DEBUG_LOGGING: ${DEBUG_LOGGING:-false}
       S3_URL: /onearth/mrf-archive
       IDX_SYNC: "false"
     volumes: 
-      - ${CONFIG_DIR}:/etc/onearth/config:ro
+      - ${DEPLOYMENT_DIR}/config:/etc/onearth/config:ro
+      - ${DEPLOYMENT_DIR}/vector-styles:/etc/onearth/vector-styles
+      - ${DEPLOYMENT_DIR}/vector-metadata:/etc/onearth/vector-metadata
       - ${MRF_ARCHIVE_DIR}:/onearth/mrf-archive:ro
       - ./compose.yml:/.dockerenv:ro  # Podman compatibility
     restart: always
@@ -52,7 +56,7 @@ services:
       S3_URL: /onearth/mrf-archive
     restart: always
     volumes:
-      - ${CONFIG_DIR}:/etc/onearth/config:ro
+      - ${DEPLOYMENT_DIR}/config:/etc/onearth/config:ro
       - ${MRF_ARCHIVE_DIR}:/onearth/mrf-archive:ro
       - ./compose.yml:/.dockerenv:ro  # Podman compatibility
     depends_on:
@@ -66,7 +70,7 @@ services:
       DEBUG_LOGGING: ${DEBUG_LOGGING:-false}
     restart: always
     volumes:
-      - ${CONFIG_DIR}:/etc/onearth/config:ro
+      - ${DEPLOYMENT_DIR}/config:/etc/onearth/config:ro
       - ${MRF_ARCHIVE_DIR}:/onearth/mrf-archive:ro
       - ./compose.yml:/.dockerenv:ro  # Podman compatibility
     depends_on:
@@ -86,7 +90,7 @@ services:
       DEBUG_LOGGING: ${DEBUG_LOGGING:-false}
       SHAPEFILE_BUCKET: /onearth/shp-archive
     volumes: 
-      - ${CONFIG_DIR}:/etc/onearth/config:ro
+      - ${DEPLOYMENT_DIR}/config:/etc/onearth/config:ro
       - ${MRF_ARCHIVE_DIR}:/onearth/mrf-archive:ro
       - ${SHP_ARCHIVE_DIR}:/onearth/shp-archive:ro
       - ./compose.yml:/.dockerenv:ro  # Podman compatibility
@@ -105,7 +109,7 @@ services:
     environment: 
       DEBUG_LOGGING: ${DEBUG_LOGGING:-false}
     volumes:
-      - ${CONFIG_DIR}:/etc/onearth/config:ro
+      - ${DEPLOYMENT_DIR}/config:/etc/onearth/config:ro
       - ./compose.yml:/.dockerenv:ro  # Podman compatibility
     restart: always
     depends_on:
