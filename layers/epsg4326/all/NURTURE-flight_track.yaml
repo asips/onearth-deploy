@@ -7,7 +7,7 @@ mime_type: "application/vnd.mapbox-vector-tile"
 static: false
 abstract: "NURTURE-flight_track"
 time_config:
-- "DETECT/PT1D"
+- "DETECT/P1D"
 metadata:
   - {"xlink:href": "https://nurture-onearth.ssec.wisc.edu/vector-styles/v1.0/NURTURE-flight_track.json", "xlink:role": "http://earthdata.nasa.gov/gibs/metadata-type/mapbox-gl-style/1.0", "xlink:title": "Mapbox GL Layer Styles", "xlink:type": "simple"}
   - {"xlink:href": "https://nurture-onearth.ssec.wisc.edu/vector-styles/v1.0/NURTURE-flight_track.json", "xlink:role": "http://earthdata.nasa.gov/gibs/metadata-type/mapbox-gl-style/", "xlink:title": "Mapbox GL Layer Styles", "xlink:type": "simple"}
