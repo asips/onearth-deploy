@@ -10,4 +10,4 @@ this repo as a submodule. Client repos are then expected to provide:
   - Static assets (colormaps, vector layer styles and metadata)
   - Instance-specific CI configuration and scripts
 
-See the nurture-onearth repo for an example.
+See the nurture-onearth repo for a complete example.

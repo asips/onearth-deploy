@@ -39,6 +39,7 @@ services:
       IDX_SYNC: "false"
     volumes: 
       - ${DEPLOYMENT_DIR}/config:/etc/onearth/config:ro
+      - ${DEPLOYMENT_DIR}/colormaps:/etc/onearth/colormaps
       - ${DEPLOYMENT_DIR}/vector-styles:/etc/onearth/vector-styles
       - ${DEPLOYMENT_DIR}/vector-metadata:/etc/onearth/vector-metadata
       - ${MRF_ARCHIVE_DIR}:/onearth/mrf-archive:ro
