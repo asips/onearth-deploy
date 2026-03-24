@@ -1,0 +1,15 @@
+{
+  "id": "Example-Bounding-Box",
+  "mvt_properties": [
+    {
+      "Identifier": "UID",
+      "Title": "UID",
+      "Description": "Unique feature identifier",
+      "DataType": "int",
+      "Function": "Identify",
+      "IsOptional": false,
+      "IsLabel": true
+    }
+  ]
+}
+
