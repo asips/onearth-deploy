@@ -3,6 +3,8 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # ensure we have all env vars needed by both this script and compose.yml
+${DEPLOYMENT_DIR?}
+${MRF_ARCHIVE_DIR?}
 export DEPLOYMENT_DIR=$(realpath ${DEPLOYMENT_DIR?})
 export MRF_ARCHIVE_DIR=$(realpath ${MRF_ARCHIVE_DIR?})
 export ONEARTH_VERSION=${ONEARTH_VERSION:-2.9.2}
