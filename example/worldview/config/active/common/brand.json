@@ -1,0 +1,9 @@
+{
+    "packageName":  "worldview",
+    "officialName": "Example Worldview for onearth-deploy",
+    "longName":     "Example Worldview for onearth-deploy",
+    "shortName":    "Example Worldview",
+    "description":  "Interactive satellite viewer",
+    "url":          "http://localhost:8080/",
+    "email":        "earthdata-support@nasa.gov"
+}
