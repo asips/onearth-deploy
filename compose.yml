@@ -1,7 +1,7 @@
 # Docker / Podman Compose configuration for OnEarth
 #
 # This was derived from the "local deployment" compose file from the OnEarth v2.9.2 repository,
-# with modifications to:
+# with modifications in order to:
 # - Address Podman compatibility issues
 # - Always use pre-built images from docker.io (no local builds)
 # - Make some services optional (disabled by default) via profiles

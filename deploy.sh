@@ -3,17 +3,9 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # ensure we have all env vars needed by both this script and compose.yml
-${DEPLOYMENT_DIR?}
-${MRF_ARCHIVE_DIR?}
-export DEPLOYMENT_DIR=$(realpath ${DEPLOYMENT_DIR?})
-export MRF_ARCHIVE_DIR=$(realpath ${MRF_ARCHIVE_DIR?})
-export ONEARTH_VERSION=${ONEARTH_VERSION:-2.9.2}
-export FORCE_REDEPLOY=${FORCE_REDEPLOY:-false}
-export COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME:-onearth}
-export ENABLE_DEMO=${ENABLE_DEMO:-false}
-export ENABLE_WMS=${ENABLE_WMS:-false}
-export ENABLE_REPROJECT=${ENABLE_REPROJECT:-false}
-
+: ${DEPLOYMENT_DIR?}
+: ${MRF_ARCHIVE_DIR?}
+FORCE_REDEPLOY=${FORCE_REDEPLOY:-false}
 if [[ -e "${DEPLOYMENT_DIR}" ]]; then
     if [[ "${FORCE_REDEPLOY}" != "true" ]]; then
         echo "ERROR: Destination already exists: ${DEPLOYMENT_DIR}"
@@ -23,6 +15,14 @@ if [[ -e "${DEPLOYMENT_DIR}" ]]; then
     ${SCRIPT_DIR}/teardown.sh
 fi
 mkdir ${DEPLOYMENT_DIR}
+export DEPLOYMENT_DIR=$(realpath ${DEPLOYMENT_DIR})
+export MRF_ARCHIVE_DIR=$(realpath ${MRF_ARCHIVE_DIR})
+export ONEARTH_VERSION=${ONEARTH_VERSION:-2.9.2}
+export COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME:-onearth}
+export ENABLE_DEMO=${ENABLE_DEMO:-false}
+export ENABLE_WMS=${ENABLE_WMS:-false}
+export ENABLE_REPROJECT=${ENABLE_REPROJECT:-false}
+
 
 # generate full config from layer config using script from the onearth repo
 ONEARTH_SRC=onearth-${ONEARTH_VERSION}
@@ -56,3 +56,8 @@ echo "#!/bin/bash" >> ${COMPOSE_SCRIPT}
 echo "podman compose -f ${DEPLOYMENT_DIR}/compose.yml ${PROFILE_ARGS}" '"$@"' >> ${COMPOSE_SCRIPT}
 chmod +x ${COMPOSE_SCRIPT}
 ${COMPOSE_SCRIPT} up -d
+
+echo
+echo "Deployment complete at ${DEPLOYMENT_DIR}. OnEarth services are up and running."
+echo "Use compose wrapper script for management, e.g.: ${COMPOSE_SCRIPT} ps"
+echo
