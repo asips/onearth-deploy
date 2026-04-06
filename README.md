@@ -119,6 +119,31 @@ directory named `onearth-<version>`, and uses parts of it for rendering
 deployment artifacts. A `.gitignore` pattern of `/onearth-*.*.*` should be used
 to exclude it from version control.
 
+## Worldview Test Container
+
+The included example layers come additionally with a Worldview test container
+that demonstrates how to set up layer access in Worldview. The container build
+leverages the [worldview-config](https://github.com/asips/worldview-config)
+project to merge custom layers with the many official layers available via [NASA
+GIBS](https://www.earthdata.nasa.gov/engage/open-data-services-software/earthdata-developer-portal/gibs-api).
+
+The Worldview configuration for the two onearth-deploy example layers can be
+found in
+[example/worldview/layer_config.json](example/worldview/layer_config.json).  To
+run the Worldview test container, run (from the top-level directory of a custom
+OnEarth project like described in the previous section):
+
+```bash
+./onearth-deploy/example/worldview/start.sh
+```
+
+And load the Worldview app in a browser by accessing: http://localhost:8080/.
+Stop and clean up the test container with:
+
+```bash
+./onearth-deploy/example/worldview/stop.sh
+```
+
 ## Environment Variables
 
 The following environment variables are available to configure the deployed
