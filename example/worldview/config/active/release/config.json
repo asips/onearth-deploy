@@ -1,0 +1,17 @@
+{
+    "wv-options-fetch": [
+        {
+            "from": "http://localhost:8000/wmts/epsg4326/all/wmts.cgi?request=GetCapabilities",
+            "to": "onearth-deploy-geographic.xml"
+        }
+    ],
+    "wv-options-wmts": [
+        {
+            "source": "ONEARTH-DEPLOY:geographic",
+            "from": "onearth-deploy-geographic.xml",
+            "to": "onearth-deploy-geographic.json",
+            "projection": "geographic",
+            "maxResolution": 0.5625
+        }
+    ]
+}

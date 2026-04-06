@@ -8,3 +8,7 @@ set -euo pipefail
 ( cd ${DEPLOYMENT_DIR} && podman compose --profile reproject --profile wms --profile demo down )
 
 rm -rf ${DEPLOYMENT_DIR}
+
+echo
+echo "Deployment at ${DEPLOYMENT_DIR} has been terminated and removed"
+echo

@@ -1,0 +1,25 @@
+layer_id: "Example-Bounding-Box"
+layer_title: "Example-Bounding-Box"
+layer_name: "Example-Bounding-Box"
+projection: "EPSG:4326"
+tilematrixset: "1km"
+mime_type: "application/vnd.mapbox-vector-tile"
+static: true
+abstract: "Example-Bounding-Box"
+metadata:
+  - {"xlink:href": "http://localhost:8000/vector-styles/v1.0/Example-Bounding-Box.json", "xlink:role": "http://earthdata.nasa.gov/gibs/metadata-type/mapbox-gl-style/1.0", "xlink:title": "Mapbox GL Layer Styles", "xlink:type": "simple"}
+  - {"xlink:href": "http://localhost:8000/vector-styles/v1.0/Example-Bounding-Box.json", "xlink:role": "http://earthdata.nasa.gov/gibs/metadata-type/mapbox-gl-style/", "xlink:title": "Mapbox GL Layer Styles", "xlink:type": "simple"}
+  - {"xlink:href": "http://localhost:8000/vector-metadata/v1.0/Example-Bounding-Box.json", "xlink:role": "http://earthdata.nasa.gov/gibs/metadata-type/layer/1.0", "xlink:title": "Layer Vector Metadata", "xlink:type": "simple"}
+  - {"xlink:href": "http://localhost:8000/vector-metadata/v1.0/Example-Bounding-Box.json", "xlink:role": "http://earthdata.nasa.gov/gibs/metadata-type/layer/", "xlink:title": "Layer Vector Metadata", "xlink:type": "simple"}
+source_mrf:
+  size_x: 40960
+  size_y: 20480
+  bands: null
+  tile_size_x: 512
+  tile_size_y: 512
+  year_dir: false
+  bbox: "-180,-90,180,90"
+  empty_tile: "/etc/onearth/empty_tiles/Blank_RGBA_512.png"
+  idx_path: "/onearth/mrf-archive/epsg4326/Example-Bounding-Box/Example-Bounding-Box.idx"
+  data_file_uri: "/onearth/mrf-archive/epsg4326/Example-Bounding-Box/Example-Bounding-Box.pvt"
+

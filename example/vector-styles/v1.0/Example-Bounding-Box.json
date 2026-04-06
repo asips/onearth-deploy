@@ -1,0 +1,24 @@
+{
+  "version": 8,
+  "name": "Example-Bounding-Box",
+  "sources": {
+    "Example-Bounding-Box": {
+      "type": "vector",
+      "tiles": [
+        "http://localhost:8000/wmts/epsg4326/all/Example-Bounding-Box/default/{TileMatrixSet}/{TileMatrix}/{TileRow}/{TileCol}.mvt"
+      ]
+    }
+  },
+  "layers": [
+    {
+      "id": "Example-Bounding-Box",
+      "type": "line",
+      "source": "Example-Bounding-Box",
+      "source-layer": "Example-Bounding-Box",
+      "paint": {
+        "line-color": "white",
+        "line-width": 10
+      }
+    }
+  ]
+}

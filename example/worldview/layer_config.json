@@ -1,0 +1,30 @@
+[
+  {
+    "id": "Example-AERDB_L2_VIIRS_SNPP-AOD",
+    "title": "Example: Deep Blue Aerosol Optical Thickness (Land and Ocean)",
+    "satellite": "snpp",
+    "instrument": "viirs",
+    "measurement": "Aerosol Optical Depth",
+    "discipline": "atmosphere",
+    "tags": [
+      "example"
+    ],
+    "colormap_id": "Aerosol_Optical_Thickness_550_Land_Ocean_Best_Estimate.colormap"
+  },
+  {
+    "id": "Example-Bounding-Box",
+    "title": "Example: Bounding Box Vector Layer",
+    "satellite": "(no satellite)",
+    "instrument": "(no instrument)",
+    "measurement": "(no measurement)",
+    "discipline": "(no discipline)",
+    "tags": [
+      "example"
+    ],
+    "type": "vector",
+    "noTransition": true,
+    "vectorStyle": {
+      "id": "Example-Bounding-Box"
+    }
+  }
+]

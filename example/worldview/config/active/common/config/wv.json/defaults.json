@@ -1,0 +1,24 @@
+{
+    "defaults": {
+        "projection": "geographic",
+        "startingLayers": [
+            {
+                "id": "Example-AERDB_L2_VIIRS_SNPP-AOD"
+            },
+            {
+                "id": "Example-Bounding-Box"
+            },
+            {
+                "id": "Coastlines_15m"
+            },
+            {
+                "id": "Reference_Features_15m",
+                "hidden": "true"
+            },
+            {
+                "id": "Reference_Labels_15m",
+                "hidden": "true"
+            }
+        ]
+    }
+}
