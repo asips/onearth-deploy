@@ -21,7 +21,7 @@ services:
     environment: 
       DEBUG_LOGGING: ${DEBUG_LOGGING:-false}
       S3_URL: /onearth/mrf-archive
-      FORCE_TIME_SCRAPE: "true"
+      FORCE_TIME_SCRAPE: ${FORCE_TIME_SCRAPE:-true}
     restart: always
     volumes:
       - ${DEPLOYMENT_DIR}/config:/etc/onearth/config:ro

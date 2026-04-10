@@ -159,6 +159,7 @@ OnEarth services. When setting boolean variables use either `true` or `false`
 | ENABLE_DEMO         | No          | false     | Enables the demo service. |
 | ENABLE_WMS          | No          | false     | Enables the wms service. |
 | ENABLE_REPROJECT    | No          | false     | Enables the reprojection service. |
+| FORCE_TIME_SCRAPE   | No          | true      | Scrape the MRF archive on startup in order to populate the time service database. |
 | DEBUG_LOGGING       | No          | false     | Enables debug logging in services that consume this variable. |
 | COMPOSE_PROJECT_NAME| No          | onearth   | Affects container / network naming. Available to avoid name collisions if needed. |
 | TILE_SERVICES_PORT  | No          | 8000      | Host port for tile services container (the primary user-facing OnEarth service). Available to avoid collisions if needed. |
