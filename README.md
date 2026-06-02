@@ -1,14 +1,14 @@
 # onearth-deploy
 
 Tools for deploying a [NASA OnEarth](https://github.com/nasa-gibs/onearth) stack
-using Docker / Podman Compose (FIXME: currenly only Podman works; see #1).
+using Docker / Podman Compose (FIXME: currenly only Podman works; see [#1](../../issues/1)).
 
 ## Overview
 
 This project provides tools to assist with deploying custom instances of the
 NASA OnEarth service. See
 [nurture-onearth](https://gitlab.ssec.wisc.edu/gregq/nurture-onearth) (FIXME: link is
-broken; see #2) for one such example. Deployment makes use of a Docker / Podman [Compose
+broken; see [#2](../../issues/2)) for one such example. Deployment makes use of a Docker / Podman [Compose
 configuration](compose.yml) derived from the
 [local-deployment](https://github.com/nasa-gibs/onearth/tree/main/docker/local-deployment)
 Docker setup contained in the NASA OnEarth GitHub repository.
